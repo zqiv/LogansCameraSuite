@@ -33,9 +33,9 @@ end
 
 local function updateNotificationPositions()
     for i, notif in ipairs(activeNotifications) do
-        local targetY = 0.85 - ((i - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) / playerGui.AbsoluteSize.Y)
+        local offsetPixels = (i - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING)
         local pushTween = TweenService:Create(notif.label, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Position = UDim2.new(0.5, -200, targetY, 0)
+            Position = UDim2.new(0.5, -200, 0.85, -offsetPixels)
         })
         pushTween:Play()
     end
@@ -54,7 +54,7 @@ local function showNotification(text)
     textLabel.TextSize = FONT_SIZE
     textLabel.Font = Enum.Font.Gotham
     textLabel.Text = text
-    textLabel.ZIndex = 2147483647 -- maximum int32 value
+    textLabel.ZIndex = 2147483647
     textLabel.Parent = notificationGui
 
     local notifData = {label = textLabel, removing = false}
@@ -63,9 +63,9 @@ local function showNotification(text)
 
     local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     
-    local targetY = 0.85 - ((#activeNotifications - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) / playerGui.AbsoluteSize.Y)
+    local offsetPixels = (#activeNotifications - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING)
     local fadeIn = TweenService:Create(textLabel, tweenInfo, {
-        Position = UDim2.new(0.5, -200, targetY, 0),
+        Position = UDim2.new(0.5, -200, 0.85, -offsetPixels),
         TextTransparency = 0,
         TextStrokeTransparency = 0
     })
