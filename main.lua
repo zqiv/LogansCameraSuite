@@ -17,7 +17,7 @@ local loadedFeatures = {}
 local notificationGui
 local activeNotifications = {}
 local NOTIFICATION_HEIGHT = 35
-local NOTIFICATION_SPACING = 2
+local NOTIFICATION_SPACING = 1
 local FONT_SIZE = 18
 
 local function initNotificationGui()
@@ -54,6 +54,7 @@ local function showNotification(text)
     textLabel.TextTransparency = 1
     textLabel.TextStrokeTransparency = 1
     textLabel.TextSize = FONT_SIZE
+    textLabel.TextScaled = false
     textLabel.Font = Enum.Font.Gotham
     textLabel.Text = text
     textLabel.ZIndex = 2147483647
@@ -99,7 +100,7 @@ end
 local function loadFeature(featurePath)
     print(featurePath .. " is loading")
     showNotification(featurePath .. " is loading")
-    task.wait(0.5) -- small delay so notifications don't overlap too fast
+    task.wait(1) -- small delay so notifications don't overlap too fast
     
     local success, feature = pcall(function()
         return loadstring(game:HttpGet("https://raw.githubusercontent.com/zqiv/LogansCameraSuite/refs/heads/main/" .. featurePath))()
@@ -165,7 +166,7 @@ end)
 print("logan's camera suite (" .. config.version .. ") has loaded!")
 showNotification("logan's camera suite (" .. config.version .. ") has loaded!")
 
-task.wait(2.5)
+task.wait(1)
 
 print('press "z" to activate')
 showNotification('press "z" to activate')
