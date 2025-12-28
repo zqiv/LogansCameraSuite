@@ -18,6 +18,7 @@ local notificationGui
 local activeNotifications = {}
 local NOTIFICATION_HEIGHT = 35
 local NOTIFICATION_SPACING = 5
+local FONT_SIZE = 18
 
 local function initNotificationGui()
     if not notificationGui then
@@ -25,15 +26,15 @@ local function initNotificationGui()
         notificationGui.IgnoreGuiInset = true
         notificationGui.ResetOnSpawn = false
         notificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-        notificationGui.DisplayOrder = 999999
+        notificationGui.DisplayOrder = 2147483647 -- maximum int32 value
         notificationGui.Parent = playerGui
     end
 end
 
-local function pushNotificationsUp()
+local function updateNotificationPositions()
     for i, notif in ipairs(activeNotifications) do
         local targetY = 0.85 - ((i - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) / playerGui.AbsoluteSize.Y)
-        local pushTween = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        local pushTween = TweenService:Create(notif.label, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Position = UDim2.new(0.5, -200, targetY, 0)
         })
         pushTween:Play()
@@ -50,14 +51,15 @@ local function showNotification(text)
     textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     textLabel.TextTransparency = 1
     textLabel.TextStrokeTransparency = 1
-    textLabel.TextSize = 16
+    textLabel.TextSize = FONT_SIZE
     textLabel.Font = Enum.Font.Gotham
     textLabel.Text = text
-    textLabel.ZIndex = 999999
+    textLabel.ZIndex = 2147483647 -- maximum int32 value
     textLabel.Parent = notificationGui
 
-    table.insert(activeNotifications, textLabel)
-    pushNotificationsUp()
+    local notifData = {label = textLabel, removing = false}
+    table.insert(activeNotifications, notifData)
+    updateNotificationPositions()
 
     local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     
@@ -69,7 +71,6 @@ local function showNotification(text)
     })
 
     local fadeOut = TweenService:Create(textLabel, tweenInfo, {
-        Position = UDim2.new(0.5, -200, 0.88, 0),
         TextTransparency = 1,
         TextStrokeTransparency = 1
     })
@@ -77,17 +78,20 @@ local function showNotification(text)
     fadeIn:Play()
     
     task.delay(2, function()
-        fadeOut:Play()
-        fadeOut.Completed:Connect(function()
-            for i, notif in ipairs(activeNotifications) do
-                if notif == textLabel then
-                    table.remove(activeNotifications, i)
-                    break
+        if not notifData.removing then
+            notifData.removing = true
+            fadeOut:Play()
+            fadeOut.Completed:Connect(function()
+                for i, notif in ipairs(activeNotifications) do
+                    if notif == notifData then
+                        table.remove(activeNotifications, i)
+                        break
+                    end
                 end
-            end
-            pushNotificationsUp()
-            textLabel:Destroy()
-        end)
+                updateNotificationPositions()
+                textLabel:Destroy()
+            end)
+        end
     end)
 end
 
