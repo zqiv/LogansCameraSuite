@@ -23,6 +23,7 @@ local FONT_SIZE = 18
 local function initNotificationGui()
     if not notificationGui then
         notificationGui = Instance.new("ScreenGui")
+        notificationGui.Name = "LogansCameraSuiteNotifications"
         notificationGui.IgnoreGuiInset = true
         notificationGui.ResetOnSpawn = false
         notificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
