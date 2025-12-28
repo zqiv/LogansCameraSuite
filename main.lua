@@ -17,13 +17,13 @@ local loadedFeatures = {}
 local notificationGui
 local activeNotifications = {}
 local NOTIFICATION_HEIGHT = 35
-local NOTIFICATION_SPACING = 5
+local NOTIFICATION_SPACING = 2
 local FONT_SIZE = 18
 
 local function initNotificationGui()
     if not notificationGui then
         notificationGui = Instance.new("ScreenGui")
-        notificationGui.Name = "LogansCameraSuiteNotifications"
+        notificationGui.Name = "lcsNotifs"
         notificationGui.IgnoreGuiInset = true
         notificationGui.ResetOnSpawn = false
         notificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -33,8 +33,9 @@ local function initNotificationGui()
 end
 
 local function updateNotificationPositions()
-    for i, notif in ipairs(activeNotifications) do
-        local offsetPixels = (i - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING)
+    for i = #activeNotifications, 1, -1 do
+        local notif = activeNotifications[i]
+        local offsetPixels = (#activeNotifications - i) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING)
         local pushTween = TweenService:Create(notif.label, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
             Position = UDim2.new(0.5, -200, 0.85, -offsetPixels)
         })
@@ -59,14 +60,13 @@ local function showNotification(text)
     textLabel.Parent = notificationGui
 
     local notifData = {label = textLabel, removing = false}
-    table.insert(activeNotifications, notifData)
+    table.insert(activeNotifications, 1, notifData) -- insert at beginning so newest is at bottom
     updateNotificationPositions()
 
     local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     
-    local offsetPixels = (#activeNotifications - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING)
     local fadeIn = TweenService:Create(textLabel, tweenInfo, {
-        Position = UDim2.new(0.5, -200, 0.85, -offsetPixels),
+        Position = UDim2.new(0.5, -200, 0.85, 0), -- always at bottom
         TextTransparency = 0,
         TextStrokeTransparency = 0
     })
