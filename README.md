@@ -29,15 +29,15 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/zqiv/LogansCameraSuit
 
 ```
 LogansCameraSuite/
-├── main.lua                    # main entry point and feature loader
-├── config.lua                  # configuration and feature definitions
+├── main.lua                    main entry point and feature loader
+├── config.lua                  configuration and feature definitions
 ├── features/
-│   ├── freecam.lua            # smooth freecam system
-│   ├── hideUI.lua             # screen gui visibility toggle
-│   ├── hidePlayers.lua        # player visibility control
-│   ├── hideBillboards.lua     # billboard hiding
-│   ├── hideChatBubbles.lua    # chat bubble control
-│   └── ignoreGuiInset.lua     # fullscreen mode
+│   ├── freecam.lua             smooth freecam system
+│   ├── hideUI.lua              screen gui visibility toggle
+│   ├── hidePlayers.lua         player visibility control
+│   ├── hideBillboards.lua      billboard hiding
+│   ├── hideChatBubbles.lua     chat bubble control
+│   └── ignoreGuiInset.lua      fullscreen mode for all guis
 └── README.md
 ```
 
