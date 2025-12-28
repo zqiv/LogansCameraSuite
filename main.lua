@@ -13,28 +13,57 @@ local config = loadstring(game:HttpGet("https://raw.githubusercontent.com/zqiv/L
 -- load all features
 local loadedFeatures = {}
 
-local function showNotification(text)
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.IgnoreGuiInset = true
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = playerGui
+-- notification system
+local notificationGui
+local activeNotifications = {}
+local NOTIFICATION_HEIGHT = 35
+local NOTIFICATION_SPACING = 5
 
+local function initNotificationGui()
+    if not notificationGui then
+        notificationGui = Instance.new("ScreenGui")
+        notificationGui.IgnoreGuiInset = true
+        notificationGui.ResetOnSpawn = false
+        notificationGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        notificationGui.DisplayOrder = 999999
+        notificationGui.Parent = playerGui
+    end
+end
+
+local function pushNotificationsUp()
+    for i, notif in ipairs(activeNotifications) do
+        local targetY = 0.85 - ((i - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) / playerGui.AbsoluteSize.Y)
+        local pushTween = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, -200, targetY, 0)
+        })
+        pushTween:Play()
+    end
+end
+
+local function showNotification(text)
+    initNotificationGui()
+    
     local textLabel = Instance.new("TextLabel")
-    textLabel.Size = UDim2.new(0, 400, 0, 30)
+    textLabel.Size = UDim2.new(0, 400, 0, NOTIFICATION_HEIGHT)
     textLabel.Position = UDim2.new(0.5, -200, 0.88, 0) 
     textLabel.BackgroundTransparency = 1
     textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     textLabel.TextTransparency = 1
     textLabel.TextStrokeTransparency = 1
-    textLabel.TextScaled = true
+    textLabel.TextSize = 16
     textLabel.Font = Enum.Font.Gotham
     textLabel.Text = text
-    textLabel.Parent = screenGui
+    textLabel.ZIndex = 999999
+    textLabel.Parent = notificationGui
+
+    table.insert(activeNotifications, textLabel)
+    pushNotificationsUp()
 
     local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     
+    local targetY = 0.85 - ((#activeNotifications - 1) * (NOTIFICATION_HEIGHT + NOTIFICATION_SPACING) / playerGui.AbsoluteSize.Y)
     local fadeIn = TweenService:Create(textLabel, tweenInfo, {
-        Position = UDim2.new(0.5, -200, 0.85, 0),
+        Position = UDim2.new(0.5, -200, targetY, 0),
         TextTransparency = 0,
         TextStrokeTransparency = 0
     })
@@ -50,7 +79,14 @@ local function showNotification(text)
     task.delay(2, function()
         fadeOut:Play()
         fadeOut.Completed:Connect(function()
-            screenGui:Destroy()
+            for i, notif in ipairs(activeNotifications) do
+                if notif == textLabel then
+                    table.remove(activeNotifications, i)
+                    break
+                end
+            end
+            pushNotificationsUp()
+            textLabel:Destroy()
         end)
     end)
 end
@@ -126,5 +162,5 @@ showNotification("logan's camera suite (" .. config.version .. ") has loaded!")
 
 task.wait(2.5)
 
-print('press "Z" to activate')
-showNotification('press "Z" to activate')
+print('press "z" to activate')
+showNotification('press "z" to activate')
